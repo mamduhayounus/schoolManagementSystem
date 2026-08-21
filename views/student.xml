@@ -1,0 +1,224 @@
+<odoo>
+    <!-- Tree/List View -->
+    <record id="view_student_tree" model="ir.ui.view">
+        <field name="name">student.student.tree</field>
+        <field name="model">student.student</field>
+        <field name="arch" type="xml">
+            <list string="Students">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="age" optional="hide"/>
+                <field name="dob" optional="hide"/>
+                <field name="gender"/>
+                <field name="cnic" optional="hide"/>
+                <field name="father_name"/>
+                <field name="guardian_name" optional="hide"/>
+                <field name="disability" optional="hide"/>
+                <field name="address" optional="hide"/>
+                <field name="institute_id"/>
+                <field name="branch_id"/>
+                <field name="level_id" optional="hide"/>
+                <field name="grade_id"/>
+                <field name="section_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_student_form" model="ir.ui.view">
+        <field name="name">student.student.form</field>
+        <field name="model">student.student</field>
+        <field name="arch" type="xml">
+            <form string="Student">
+                <header>
+                    <button type="object"
+                            name="action_draft"
+                            string="Reset Draft"
+                            class="btn-info"
+                            invisible="status not in ['accept', 'reject']"
+                            groups="school.group_school_admin"
+                    />
+
+                    <button type="object"
+                            name="action_accept"
+                            string="Enroll"
+                            class="btn-success"
+                            invisible="status != 'draft'"
+                            groups="school.group_school_admin"
+                    />
+
+                    <button type="object"
+                            name="action_reject"
+                            string="Reject"
+                            class="btn-danger"
+                            invisible="status != 'draft'"
+                            groups="school.group_school_admin"
+
+                    />
+                    <field name="status" widget="statusbar" options="{'clickable': False}"  />
+
+                </header>
+                <sheet>
+                    <field name="uploaded_image"
+                           widget="image"
+                           class="oe_avatar"
+                           options="{'preview_image': 'uploaded_image', 'size': [128, 128]}"
+                           readonly="status == 'accept' or status == 'reject'"
+                    />
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Student Name" string="Student Name" required="1" readonly="status == 'accept' or status == 'reject'"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="admission_id" string="Admission ID" readonly="1" class="fw-bold"/>
+                        <field name="std_id" string="Student ID" required="1" readonly="status == 'accept' or status== 'reject'"/>
+                    </group>
+                    <div class="clearfix"/>
+
+                    <group string="Academic Information">
+                        <group>
+                            <field name="code" string="Code" readonly="1"/>
+                            <field name="institute_id" required="1" readonly="status == 'accept' or status == 'reject'" options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+                            <field
+                                    name="branch_id" required="1"
+                                    domain ="[('institute_id', '=', institute_id)]"
+                                    readonly="status == 'accept' or status == 'reject'"
+                                    options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+                        </group>
+                        <group>
+                            <field
+                                    name="level_id" required="1"
+                                    domain="[('branch_ids', 'in', [branch_id])]"
+                                    readonly="status == 'accept' or status == 'reject'"
+                                    options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+
+                            <field
+                                    name="grade_id" required="1"
+                                    domain ="[('level_id','=',level_id)]"
+                                    readonly="status == 'accept' or status == 'reject'"
+                                    options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+
+
+                            <field
+                                    name="section_id" required="1"
+                                    domain="[('grade_ids', 'in', [grade_id])]"
+                                    readonly="status == 'accept' or status == 'reject'"
+                                    options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Personal Information">
+                            <group>
+                                <field name="gender" required="1" readonly="status == 'accept' or status == 'reject'"/>
+                                <field name="age_display" required="1" readonly="True"/>
+                                <field name="dob" readonly="status == 'accept' or status == 'reject'"/>
+                                <field name="cnic" required="1" readonly="status == 'accept' or status == 'reject'"/>
+                            </group>
+
+                        </page>
+
+                        <page string="Family Information">
+                            <group>
+                                <field name="father_name" required="1" readonly="status == 'accept' or status == 'reject'"/>
+                                <field name="guardian_name" readonly="status == 'accept' or status == 'reject'"/>
+                                <field name="address" required="1" readonly="status == 'accept' or status == 'reject'"/>
+                                <field name="disability" readonly="status == 'accept' or status == 'reject'"/>
+                                <field name="disability_details" invisible="not disability" required="1"/>
+                            </group>
+
+                        </page>
+
+                        <page string="Academic History">
+                            <field name="academic_history_ids">
+                                <list string="Academic History" editable="bottom">
+                                    <field name="name" string="Previous School" required="1" readonly="parent.status in ['accept', 'reject']"/>
+                                    <field name="address" string="Previous School Address" required="1" readonly="parent.status in ['accept', 'reject']"/>
+                                    <field name="grade" string="Previous Grade" required="1" readonly="parent.status in ['accept', 'reject']"/>
+                                    <field name="year" string="Previous School Year" required="1" readonly="parent.status in ['accept', 'reject']"/>
+                                    <field name="percentage" string="Previous Grade Percentage" required="1" readonly="parent.status in ['accept', 'reject']"/>
+                                    <field name="board" required="1" readonly="parent.status in ['accept', 'reject']"/>
+                                    <field name="disciplinary_record" readonly="parent.status in ['accept', 'reject']"/>
+                                    <field name="disciplinary_record_details" invisible="not disciplinary_record" required="disciplinary_record" readonly="parent.status in ['accept', 'reject']"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_student_search" model="ir.ui.view">
+        <field name="name">student.student.search</field>
+        <field name="model">student.student</field>
+        <field name="arch" type="xml">
+            <search string="Search Students">
+                <field name="name"/>
+                <field name="cnic"/>
+                <field name="father_name"/>
+                <field name="guardian_name"/>
+                <field name="gender"/>
+                <field name="institute_id"/>
+                <field name="branch_id"/>
+                <field name="level_id"/>
+                <field name="grade_id"/>
+                <field name="section_id"/>
+
+                <group expand="0" string="Group By">
+                    <filter
+                            string="Gender"
+                            name="gender_group"
+                            context="{'group_by': 'gender'}"/>
+
+                    <filter
+                            string="Institute"
+                            name="institute_group"
+                            context="{'group_by': 'institute_id'}"/>
+
+                    <filter
+                            string="Branch"
+                            name="branch_group"
+                            context="{'group_by': 'branch_id'}"/>
+
+                    <filter
+                            string="Level"
+                            name="level_group"
+                            context="{'group_by': 'level_id'}"/>
+
+                    <filter
+                            string="Grade"
+                            name="grade_group"
+                            context="{'group_by': 'grade_id'}"/>
+
+                    <filter
+                            string="Section"
+                            name="section_group"
+                            context="{'group_by': 'section_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_student" model="ir.actions.act_window">
+        <field name="name">Students</field>
+        <field name="res_model">student.student</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Menu Items -->
+
+    <menuitem id="menu_student_student"
+              name="Students"
+              parent="menu_school_root"
+              action="action_student"
+              sequence="10"
+              groups="school.group_school_admin"/>
+</odoo>

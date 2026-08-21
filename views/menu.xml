@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+    <menuitem
+            id="menu_admissions"
+            name="Admission"
+            parent="menu_school_root"
+            action="action_admission"
+            sequence="20"
+    groups="stock.group_stock_manager"/>
+</odoo>

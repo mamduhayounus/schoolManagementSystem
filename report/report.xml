@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- REPORT ACTION -->
+    <record id="action_report_student_card" model="ir.actions.report">
+        <field name="name">Print Student Card</field>
+        <field name="model">student.student</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">school.student_card</field>
+        <field name="report_file">school.student_card</field>
+        <field name="print_report_name">'Student Card - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_student_student"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- QWEB REPORT LAYOUT TEMPLATE -->
+    <template id="student_card">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="student">
+                <t t-call="web.external_layout">
+                    <div class="page pt-0 mt-0" style="padding-top: 0px !important; margin-top: 0px !important;">
+
+                        <!-- Header Row: Title on Left, Photo on Right -->
+                        <div class="row mb-4 align-items-center">
+                            <div class="col-8 text-start">
+                                <h2>Student Card</h2>
+                                <p class="text-muted mb-0">Student Card</p>
+                            </div>
+                            <div class="col-4 text-end">
+                                <t t-if="student.uploaded_image">
+                                    <img t-att-src="image_data_uri(student.uploaded_image)"
+                                         style="max-height: 120px; max-width: 100%; border: 1px solid #050505; border-radius: 4px;"/>
+                                </t>
+                                <t t-else="">
+                                    <div style="height: 100px; width: 100px; border: 1px dashed #ccc; line-height: 100px; color: #aaa; border-radius: 4px; display: inline-block;" class="text-center">
+                                        No Photo
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Main Details Container -->
+                        <div class="row mb-4">
+                            <div>
+                                <!-- Top Student Information Table -->
+                                <table class="table table-bordered mb-0" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 25%; background-color: #cfcfcf; color: #5e3b69;">Name:</th>
+                                            <th style="width: 25%;"><span t-field="student.name"/></th>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 25%; background-color: #cfcfcf; color: #5e3b69;">ID:</td>
+                                            <td style="width: 25%;"><span t-field="student.std_id"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #cfcfcf; color: #5e3b69;">CODE:</td>
+                                            <td><span t-field="student.code"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #cfcfcf; color: #5e3b69;">INSTITUTE:</td>
+                                            <td><span t-field="student.institute_id.name"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #cfcfcf; color: #5e3b69;">BRANCH:</td>
+                                            <td><span t-field="student.branch_id.name"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #cfcfcf; color: #5e3b69;">LEVEL:</td>
+                                            <td><span t-field="student.level_id.name"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #cfcfcf; color: #5e3b69;">GRADE:</td>
+                                            <td><span t-field="student.grade_id.name"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #cfcfcf; color: #5e3b69;">SECTION:</td>
+                                            <td><span t-field="student.section_id.name"/></td>
+                                        </tr>
+                                    </thead>
+                                </table>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

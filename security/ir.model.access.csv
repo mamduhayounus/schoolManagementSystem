@@ -1,0 +1,19 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_student_admin,student admin,model_student_student,group_school_admin,1,1,1,1
+access_institute_admin,institute admin,model_institute_institute,group_school_admin,1,1,1,1
+access_branch_admin,branch admin,model_branch_branch,group_school_admin,1,1,1,1
+access_level_admin,level admin,model_level_level,group_school_admin,1,1,1,1
+access_grade_admin,grade admin,model_grade_grade,group_school_admin,1,1,1,1
+access_section_admin,section admin,model_section_section,group_school_admin,1,1,1,1
+access_admission_admin,admission admin,model_admission_admission,group_school_admin,1,1,1,1
+access_academic_history_admin,academic history admin,model_academic_history_academic_history,group_school_admin,1,1,1,1
+
+access_student_user,student user,model_student_student,group_school_user,1,1,1,0
+access_institute_user,institute user,model_institute_institute,group_school_user,1,0,0,0
+access_branch_user,branch user,model_branch_branch,group_school_user,1,0,0,0
+access_level_user,level user,model_level_level,group_school_user,1,0,0,0
+access_grade_user,grade user,model_grade_grade,group_school_user,1,0,0,0
+access_section_user,section user,model_section_section,group_school_user,1,0,0,0
+access_admission_user,admission user,model_admission_admission,group_school_user,1,1,1,0
+access_academic_history_user,academic history user,model_academic_history_academic_history,group_school_user,1,1,0,0

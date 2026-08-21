@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Institute Tree View -->
+    <record id="view_institute_tree" model="ir.ui.view">
+        <field name="name">institute.institute.tree</field>
+        <field name="model">institute.institute</field>
+        <field name="arch" type="xml">
+            <list string="Institutes">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="contact_number"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Institute Form View -->
+    <record id="view_institute_form" model="ir.ui.view">
+        <field name="name">institute.institute.form</field>
+        <field name="model">institute.institute</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Institute Name" required="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="code"/>
+                        <field name="contact_number" required="1"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Branches">
+                            <field name="branch_ids">
+                                <list editable="bottom">
+                                    <field name="name" required="1"/>
+                                    <field name="location"/>
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Institute Action -->
+    <record id="action_institute" model="ir.actions.act_window">
+        <field name="name">Institutes</field>
+        <field name="res_model">institute.institute</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Institute Search View -->
+    <record id="view_institute_search" model="ir.ui.view">
+        <field name="name">institute.institute.search</field>
+        <field name="model">institute.institute</field>
+        <field name="arch" type="xml">
+            <search string="Search Institutes">
+                <field name="name"/>
+                <field name="contact_number"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem
+            id="menu_school_root"
+            name="School Management"
+            sequence="1"/>
+
+    <menuitem
+            id="menu_configuration"
+            name="Configuration"
+            parent="menu_school_root"
+            sequence="100"/>
+
+    <menuitem
+            id="menu_institute"
+            name="Institutes"
+            parent="menu_configuration"
+            action="action_institute"
+            sequence="10"
+            groups="school.group_school_admin"/>
+</odoo>

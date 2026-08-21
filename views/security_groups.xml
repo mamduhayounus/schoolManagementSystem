@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="module_category_school" model="ir.module.category">
+        <field name="name">School Management</field>
+        <field name="description">School Management Features</field>
+    </record>
+
+    <record id="group_school_user" model="res.groups">
+        <field name="name">School User</field>
+        <field name="category_id" ref="school.module_category_school"/>
+        <field name="comment">Basic access to school features</field>
+    </record>
+
+    <record id="group_school_admin" model="res.groups">
+        <field name="name">School Admin</field>
+        <field name="category_id" ref="school.module_category_school"/>
+        <field name="implied_ids" eval="[(6,0,[ref('school.group_school_user')])]"/>
+        <field name="comment">Full access to school features</field>
+    </record>
+
+</odoo>

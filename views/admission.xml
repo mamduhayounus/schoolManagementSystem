@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="seq_admission_admission" model="ir.sequence">
+        <field name="name">Admission Sequence</field>
+        <field name="code">admission.admission</field>
+        <field name="prefix">AD</field>
+        <field name="padding">4</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+        <field name="company_id" eval="False"/>
+    </record>
+    <!-- Admission List View -->
+    <record id="view_admission_list" model="ir.ui.view">
+        <field name="name">admission.admission.list</field>
+        <field name="model">admission.admission</field>
+        <field name="arch" type="xml">
+            <list string="Admissions">
+                <field name="name" string="Code"/>
+                <field name="application_date"/>
+                <field name="first_name"/>
+                <field name="admission_type"/>
+                <field name="academic_year"/>
+                <field name="applied_for_branch_id"/>
+                <field name="applied_for_grade_id"/>
+                <field name="status"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Admission Form View -->
+    <record id="view_admission_form" model="ir.ui.view">
+        <field name="name">admission.admission.form</field>
+        <field name="model">admission.admission</field>
+        <field name="arch" type="xml">
+            <form string="Admission">
+                <header>
+                    <button name="action_pending"
+                            type="object"
+                            string="Submit"
+                            class="btn-primary"
+                            invisible="status != 'draft'"
+                            groups="school.group_school_user"
+                    />
+
+                    <button name="action_accept"
+                            type="object"
+                            string="Accept"
+                            class="btn-success"
+                            invisible="status != 'pending'"
+                            groups="school.group_school_admin"
+                    />
+
+                    <button name="action_reject"
+                            type="object"
+                            string="Reject"
+                            class="btn-danger"
+                            invisible="status != 'pending' "
+                            groups="school.group_school_admin"
+                    />
+
+
+                    <button name="action_draft"
+                            type="object"
+                            string="Reset Draft"
+                            class="btn-info"
+                            invisible="status not in ['pending', 'accept', 'reject']"
+                            groups="school.group_school_admin"
+
+                    />
+
+                    <field name="status"
+                           widget="statusbar"
+                           statusbar_visible="draft,pending,accept,reject"/>
+
+                    <button name="action_create_student"
+                            type="object"
+                            string="Create Student"
+                            class="btn-primary"
+                            invisible="status != 'accept'"
+                            groups="school.group_school_admin"
+                    />
+                </header>
+
+                <sheet >
+                    <field name="uploaded_image"
+                           widget="image"
+                           class="oe_avatar"
+                           options="{'preview_image': 'uploaded_image', 'max_width':1024, 'max_height':768}"/>
+
+                    <field name="student_id" invisible="1"/>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" string="Admission Number" readonly="1" />
+                        </h1>
+                    </div>
+
+                    <!-- Green Success Alert Box -->
+                    <div class="alert alert-success d-flex align-items-center justify-content-between mb-3"
+                         role="alert"
+                         invisible="not student_id">
+                        <div>
+                            <i class="fa fa-check-circle me-2"/>
+                            <span>Student has been successfully created! Student ID: </span>
+                            <button name="action_open_student"
+                                    type="object"
+                                    class="btn btn-link p-0 fw-bold align-baseline text-success ms-1"
+                                    style="text-decoration: underline;">
+                                <field name="student_ref_display" readonly="1"/>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="clearfix"/>
+
+                    <group string="Admission Application" >
+                        <group>
+                            <field name="application_date" readonly="1"/>
+                            <field name="admission_type" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                            <field name="academic_year" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                        </group>
+                        <group>
+                            <field name="applied_for_institute_id" readonly="status in ['accept', 'reject', 'pending']" options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+                            <field name="applied_for_branch_id"
+                                   domain="[('institute_id', '=', applied_for_institute_id)]"
+                                   readonly="status in ['accept', 'reject', 'pending']"
+                                   options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+                            <field name="applied_for_level_id"
+                                   domain="[('branch_ids', 'in', [applied_for_branch_id])]"
+                                   options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"
+                                   readonly="status in ['accept', 'reject', 'pending']"/>
+                            <field name="applied_for_grade_id"
+                                   options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"
+                                   domain="[('level_id', '=', applied_for_level_id)]"
+                                   readonly="status in ['accept', 'reject', 'pending']"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Student Information">
+                            <group string="Student Core Information">
+                                <group>
+                                    <field name="first_name" required="1"
+                                           readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="middle_name"
+                                           readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="last_name"
+                                           readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="dob" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="age_display" readonly="1" />
+                                    <field name="pob" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                                <group>
+                                    <field name="gender" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="cnic" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="nationality" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="dual_nationality" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="dual_nationality_details"
+                                           invisible="not dual_nationality"
+                                           required="dual_nationality"
+                                           readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="religion" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                            </group>
+
+                            <group string="Languages">
+                                <group>
+                                    <field name="language_urdu" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="language_english" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="language_other" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                                <group>
+                                    <field name="other_languages"
+                                           invisible="not language_other"
+                                           required="language_other"
+                                           placeholder="Enter other languages"
+                                           readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Address and Transport">
+                            <group string="Residential and Logistic Data">
+                                <group>
+                                    <field name="permanent_address" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="current_address" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="current_address_details"
+                                           invisible="current_address" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                                <group>
+                                    <field name="commute_mode" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Parents">
+                            <group string="Father Information">
+                                <group>
+                                    <field name="father_name" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="father_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="father_mobile_number" required="1"
+                                           invisible=" not father_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="father_personal_email" required="1"
+                                           invisible="not father_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="father_home_address" required="1"
+                                           invisible="not father_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                                <group>
+                                    <field name="father_job_title"
+                                           invisible="not father_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="father_office_address"
+                                           invisible="not father_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="father_workplace_name"
+                                           invisible="not father_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="father_workplace_landline"
+                                           invisible="not father_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="father_work_email"
+                                           invisible="not father_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="father_alumni"
+                                           invisible=" not father_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="father_alumni_details"
+                                           invisible="not father_alumni"
+                                           required="father_alumni" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                            </group>
+
+                            <group string="Mother Information">
+                                <group>
+                                    <field name="mother_name" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="mother_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="mother_mobile_number"
+                                           invisible="not mother_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="mother_personal_email"
+                                           invisible="not mother_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="mother_home_address"
+                                           invisible="not mother_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                                <group>
+                                    <field name="mother_job_title"
+                                           invisible="not mother_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="mother_office_address"
+                                           invisible="not mother_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="mother_workplace_name"
+                                           invisible="not mother_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="mother_workplace_landline"
+                                           invisible="not mother_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="mother_work_email"
+                                           invisible=" not mother_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="mother_alumni"
+                                           invisible="not mother_is_alive" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="mother_alumni_details"
+                                           invisible="not mother_alumni"
+                                           required="mother_alumni" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Guardian">
+                            <group string="Guardian Information">
+                                <group>
+                                    <field name="guardian_is_father" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="guardian_is_mother" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="guardian_name" required="1"
+                                           invisible="guardian_is_father or guardian_is_mother" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="guardian_relation" required="1"
+                                           invisible="guardian_is_father or guardian_is_mother" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="guardian_mobile_number" required="1"
+                                           invisible="guardian_is_father or guardian_is_mother" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="guardian_personal_email" required="1"
+                                           invisible="guardian_is_father or guardian_is_mother" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="guardian_home_address" required="1"
+                                           invisible="guardian_is_father or guardian_is_mother" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                                <group>
+                                    <field name="guardian_job_title" required="1"
+                                           invisible="guardian_is_father or guardian_is_mother" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="guardian_office_address"
+                                           invisible="guardian_is_father or guardian_is_mother" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="guardian_workplace_name"
+                                           invisible="guardian_is_father or guardian_is_mother" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="guardian_workplace_landline"
+                                           invisible="guardian_is_father or guardian_is_mother" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="guardian_work_email"
+                                           invisible="guardian_is_father or guardian_is_mother" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="guardian_marital_status" required="1"
+                                           invisible="guardian_is_father or guardian_is_mother" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="guardian_alumni" required="1"
+                                           invisible="guardian_is_father or guardian_is_mother" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="guardian_alumni_details"
+                                           invisible="not guardian_alumni"
+                                           required="guardian_alumni" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Emergency">
+                            <group string="Emergency Contacts">
+                                <group string="Emergency Contact" required="1" readonly="status in ['accept', 'reject', 'pending']">
+                                    <field name="emergency_contact_name1" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="emergency_contact_relation1" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="emergency_contact_number1" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                            </group>
+                            <group string="Authorised Pickup">
+                                <field name="authorised_pickup_name" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                <field name="authorised_pickup_cnic" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                <field name="authorised_pickup_number" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                            </group>
+                        </page>
+
+                        <page string="Academic History">
+                            <group string="Previous School">
+                                <group>
+                                    <field name="previous_school" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="previous_school_address" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="previous_school_class" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="previous_school_year" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                                <group>
+                                    <field name="previous_school_percentage" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="previous_school_board" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="disciplinary_record" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="disciplinary_record_details"
+                                           invisible="not disciplinary_record"
+                                           required="disciplinary_record" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Medical">
+                            <group string="Medical Information">
+                                <group>
+                                    <field name="blood_group" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="chronic_conditions" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="has_allergies" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="allergy_details"
+                                           invisible="not has_allergies"
+                                           required="has_allergies" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="allergy_severity"
+                                           invisible="not has_allergies"
+                                           required="has_allergies" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="requires_epipen"
+                                           invisible="not has_allergies" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                                <group>
+                                    <field name="has_regular_medication" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="regular_medication_details"
+                                           invisible="not has_regular_medication"
+                                           required="has_regular_medication" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="disability" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="disability_details"
+                                           invisible="not disability"
+                                           required="disability" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="learning_disability" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="learning_disability_details"
+                                           invisible="not learning_disability"
+                                           required="learning_disability" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                            </group>
+
+                            <group string="Family Doctor">
+                                <group>
+                                    <field name="family_doctors_name" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="family_doctors_contact" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                                <group>
+                                    <field name="family_doctors_email" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="family_doctors_clinic" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Financial">
+                            <group string="Siblings Details">
+                                <group>
+                                    <field name="siblings_count" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="siblings_name" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="siblings_age" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="siblings_education" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                                <group>
+                                    <field name="siblings_enrolled" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="siblings_enrolled_details"
+                                           invisible="not siblings_enrolled"
+                                           required="siblings_enrolled" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="siblings_occupation"
+                                           invisible="siblings_enrolled"
+                                           required="not siblings_enrolled" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="siblings_income"
+                                           invisible=" siblings_enrolled"
+                                           required="not siblings_enrolled" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                            </group>
+
+                            <group string="Tuition Fee Responsible Person">
+                                <group>
+                                    <field name="fee_payer_name" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="fee_payer_cnic" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                                <group>
+                                    <field name="fee_payer_address" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                    <field name="fee_payer_email" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                </group>
+                            </group>
+
+                            <group string="Marketing Source">
+                                <field name="marketing_source" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                <field name="marketing_source_details"
+                                       invisible="marketing_source != 'other'"
+                                       required="marketing_source == 'other'" readonly="status in ['accept', 'reject', 'pending']"/>
+                            </group>
+                        </page>
+
+                        <page string="Legal Consent">
+                            <group string="Consent">
+                                <field name="media_release" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                <field name="field_trip_permission" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                <field name="medical_emergency_authorization" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                            </group>
+                            <group string="Medical Emergency Authorization"
+                                   invisible="not medical_emergency_authorization" readonly="status in ['accept', 'reject', 'pending']">
+                                <field name="medical_emergency_signature"
+                                       required="medical_emergency_authorization" readonly="status in ['accept', 'reject', 'pending']"/>
+                                <field name="medical_emergency_signature_date"
+                                       required="medical_emergency_authorization" readonly="status in ['accept', 'reject', 'pending']"/>
+                            </group>
+
+                            <group string="Accuracy Declaration">
+                                <field name="accuracy_declaration" required="1" readonly="status in ['accept', 'reject', 'pending']"/>
+                                <field name="accuracy_signature"
+                                       required="accuracy_declaration" readonly="status in ['accept', 'reject', 'pending']"/>
+                                <field name="accuracy_signature_date"
+                                       required="accuracy_declaration" readonly="status in ['accept', 'reject', 'pending']"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Admission Search View -->
+    <record id="view_admission_search" model="ir.ui.view">
+        <field name="name">admission.admission.search</field>
+        <field name="model">admission.admission</field>
+        <field name="arch" type="xml">
+            <search string="Search Admissions">
+                <field name="name"/>
+                <field name="first_name"/>
+                <field name="last_name"/>
+                <field name="application_date"/>
+                <field name="admission_type"/>
+                <field name="academic_year"/>
+                <field name="applied_for_branch_id"/>
+                <field name="applied_for_level_id"/>
+                <field name="applied_for_grade_id"/>
+                <field name="status"/>
+
+                <filter name="draft" string="Draft" domain="[('status', '=', 'draft')]"/>
+                <filter name="pending" string="Pending" domain="[('status', '=', 'pending')]"/>
+                <filter name="accepted" string="Accepted" domain="[('status', '=', 'accept')]"/>
+                <filter name="rejected" string="Rejected" domain="[('status', '=', 'reject')]"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Admission Type" name="group_admission_type" context="{'group_by': 'admission_type'}"/>
+                    <filter string="Academic Year" name="group_academic_year" context="{'group_by': 'academic_year'}"/>
+                    <filter string="Application Date" name="group_application_date" context="{'group_by': 'application_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Admission Action -->
+    <record id="action_admission" model="ir.actions.act_window">
+        <field name="name">Admissions</field>
+        <field name="res_model">admission.admission</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Admission Menu -->
+<!--    <menuitem id="menu_admission"-->
+<!--              name="Admissions"-->
+<!--              parent="menu_school_root"-->
+<!--              sequence="20"-->
+<!--              groups="school.group_school_admin"/>-->
+
+
+</odoo>

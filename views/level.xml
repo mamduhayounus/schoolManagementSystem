@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_level_tree" model="ir.ui.view">
+        <field name="name">level.level.tree</field>
+        <field name="model">level.level</field>
+        <field name="arch" type="xml">
+            <list string="Levels">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="branch_ids" widget="many2many_tags"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_level_form" model="ir.ui.view">
+        <field name="name">level.level.form</field>
+        <field name="model">level.level</field>
+        <field name="arch" type="xml">
+            <form string="Level">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Level of Education" required="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <field name="code"/>
+                    </group>
+                    <notebook>
+                        <page string="Grades">
+                            <field name="grade_ids" >
+                                <list editable="bottom">
+                                    <field name="name" required="1" options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Branches">
+                            <field name="branch_ids">
+                                <list>
+                                    <field name="name" required="1" options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Level Search View -->
+    <record id="view_level_search" model="ir.ui.view">
+        <field name="name">level.level.search</field>
+        <field name="model">level.level</field>
+        <field name="arch" type="xml">
+            <search string="Search Levels">
+                <field name="name"/>
+<!--                <field name="branch_ids"/>-->
+
+<!--                <group expand="0" string="Group By">-->
+<!--                    <filter-->
+<!--                        string="Branch"-->
+<!--                        name="branch_group"-->
+<!--                        context="{'group_by': 'branch_ids'}"/>-->
+<!--                </group>-->
+            </search>
+        </field>
+    </record>
+
+    <record id="action_level" model="ir.actions.act_window">
+        <field name="name">Levels</field>
+        <field name="res_model">level.level</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+    <menuitem
+            id="menu_level"
+            name="Levels"
+            parent="menu_configuration"
+            action="action_level"
+            groups="school.group_school_admin"/>
+
+</odoo>
